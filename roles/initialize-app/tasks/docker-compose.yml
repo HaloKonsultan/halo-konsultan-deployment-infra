@@ -1,0 +1,64 @@
+version: '3.3'
+
+services:
+    # Router
+    router:
+        image: fatihkhoir/halokonsultan-ro:latest
+        container_name: halokonsultan-ro
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - halokonsultan-network
+    
+    # Backend Services
+    backend-app:
+        image: fatihkhoir/halokonsultan-be:latest
+        container_name: halokonsultan-be
+        restart: unless-stopped
+        tty: true
+        env_file: 
+            - ./environment/.env
+        networks:
+            - halokonsultan-network
+             
+    # Web Service	
+    web-app:
+        image: hifito/halokonsultan-fe:latest
+        container_name: halokonsultan-fe
+        restart: unless-stopped
+        tty: true
+        networks: 
+            - halokonsultan-network
+    
+    # Database Service
+    mariadb:
+        image: mariadb:latest
+        container_name: halokonsultan-backend-database-mariadb
+        restart: unless-stopped
+        tty: true
+        ports: 
+            - "3306:3306"
+        environment: 
+            MYSQL_DATABASE: 
+            MYSQL_USER: 
+            MYSQL_PASSWORD: 
+            MYSQL_ROOT_PASSWORD: root
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mariadb
+        volumes:
+            - halokonsultan-data:/var/lib/mysql
+        networks: 
+            - halokonsultan-network
+
+# Docker Networks
+networks:
+        halokonsultan-network:
+            driver: bridge
+
+# Volumes
+volumes:
+        halokonsultan-data:
+            driver: local

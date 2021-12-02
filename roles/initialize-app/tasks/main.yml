@@ -1,0 +1,24 @@
+---
+- name: Copy docker compose file
+  copy:
+    src: docker-compose.yml
+    dest: /root/docker-compose.yml
+
+- name : Create envoronment directory for backend
+  file:
+    path: /root/environment
+    state: directory
+
+- name: Copy environment
+  copy:
+    src: environment/.env
+    dest: /root/environment/.env
+
+- name: Run compose up for app
+  docker_compose : 
+    project_src: /root
+
+- name: Run key generate in BE
+  become: True
+  shell:
+    cmd: "docker exec -it halokonsultan-be php artisan key:generate"
